@@ -1,0 +1,136 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Users - Vehicle Parking App{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <h2><i class="fas fa-users me-2"></i>Manage Users</h2>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-list me-2"></i>All Users</h5>
+            </div>
+            <div class="card-body">
+                {% if users %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th>Username</th>
+                                    <th>Email</th>
+                                    <th>Role</th>
+                                    <th>Registration Date</th>
+                                    <th>Active Reservations</th>
+                                    <th>Total Reservations</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for user in users %}
+                                    <tr>
+                                        <td>
+                                            <strong>{{ user.username }}</strong>
+                                        </td>
+                                        <td>{{ user.email }}</td>
+                                        <td>
+                                            {% if user.role == 'admin' %}
+                                                <span class="badge bg-danger">Admin</span>
+                                            {% else %}
+                                                <span class="badge bg-primary">User</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if user.created_at %}
+                                                {% if user.created_at is string %}
+                                                    {{ user.created_at[:10] }}
+                                                {% else %}
+                                                    {{ user.created_at.strftime('%Y-%m-%d') }}
+                                                {% endif %}
+                                            {% else %}
+                                                <span class="text-muted">N/A</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% set active_count = user.reservations|selectattr('status', 'equalto', 'active')|list|length %}
+                                            <span class="badge bg-info">{{ active_count }}</span>
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-secondary">{{ user.reservations|length }}</span>
+                                        </td>
+                                        <td>
+                                            {% if user.role != 'admin' %}
+                                                <a href="{{ url_for('admin_delete_user_route', user_id=user.id) }}" 
+                                                   class="btn btn-sm btn-outline-danger"
+                                                   onclick="return confirm('Are you sure you want to delete user {{ user.username }}? This action cannot be undone.')">
+                                                    <i class="fas fa-trash"></i> Delete
+                                                </a>
+                                            {% else %}
+                                                <span class="text-muted">Admin user</span>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="text-center py-4">
+                        <i class="fas fa-users fa-3x text-muted mb-3"></i>
+                        <h5 class="text-muted">No users found</h5>
+                        <p class="text-muted">No users have registered yet.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- User Statistics -->
+{% if users %}
+    <div class="row mt-4">
+        <div class="col-md-3">
+            <div class="card bg-primary text-white">
+                <div class="card-body text-center">
+                    <h4 class="card-title">{{ users|length }}</h4>
+                    <p class="card-text">Total Users</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-success text-white">
+                <div class="card-body text-center">
+                    <h4 class="card-title">{{ users|selectattr('role', 'equalto', 'user')|list|length }}</h4>
+                    <p class="card-text">Regular Users</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-info text-white">
+                <div class="card-body text-center">
+                    <h4 class="card-title">{{ users|selectattr('role', 'equalto', 'admin')|list|length }}</h4>
+                    <p class="card-text">Admin Users</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-warning text-white">
+                <div class="card-body text-center">
+                    <h4 class="card-title">
+                        {% set total_reservations = 0 %}
+                        {% for user in users %}
+                            {% set total_reservations = total_reservations + user.reservations|length %}
+                        {% endfor %}
+                        {{ total_reservations }}
+                    </h4>
+                    <p class="card-text">Total Reservations</p>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endif %}
+{% endblock %} 

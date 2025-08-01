@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+
+{% block title %}Home - Vehicle Parking App{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-8 mx-auto text-center">
+        <div class="card bg-primary text-white mb-5">
+            <div class="card-body py-5">
+                <h1 class="display-4 fw-bold mb-4">
+                    <i class="fas fa-parking me-3"></i>Welcome to Vehicle Parking App
+                </h1>
+                <p class="lead mb-4">Smart parking management system for efficient vehicle parking</p>
+                {% if not current_user.is_authenticated %}
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+                        <a href="{{ url_for('login_route') }}" class="btn btn-light btn-lg px-4 me-md-2">
+                            <i class="fas fa-sign-in-alt me-2"></i>Login
+                        </a>
+                        <a href="{{ url_for('register_route') }}" class="btn btn-outline-light btn-lg px-4">
+                            <i class="fas fa-user-plus me-2"></i>Register
+                        </a>
+                    </div>
+                {% else %}
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+                        {% if current_user.is_admin %}
+                            <a href="{{ url_for('admin_dashboard_route') }}" class="btn btn-light btn-lg px-4">
+                                <i class="fas fa-tachometer-alt me-2"></i>Admin Dashboard
+                            </a>
+                        {% else %}
+                            <a href="{{ url_for('user_dashboard_route') }}" class="btn btn-light btn-lg px-4">
+                                <i class="fas fa-tachometer-alt me-2"></i>User Dashboard
+                            </a>
+                        {% endif %}
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <div class="col-md-4">
+        <div class="card h-100">
+            <div class="card-body text-center">
+                <i class="fas fa-car fa-3x text-primary mb-3"></i>
+                <h5 class="card-title">Easy Parking</h5>
+                <p class="card-text">Find and book available parking spots quickly and easily with our intuitive interface.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card h-100">
+            <div class="card-body text-center">
+                <i class="fas fa-clock fa-3x text-primary mb-3"></i>
+                <h5 class="card-title">Real-time Updates</h5>
+                <p class="card-text">Get real-time information about parking spot availability and current status.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card h-100">
+            <div class="card-body text-center">
+                <i class="fas fa-shield-alt fa-3x text-primary mb-3"></i>
+                <h5 class="card-title">Secure Management</h5>
+                <p class="card-text">Secure parking management with admin controls and user authentication.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-5">
+    <div class="col-lg-8 mx-auto">
+        <div class="card">
+            <div class="card-header bg-light">
+                <h4 class="mb-0"><i class="fas fa-info-circle me-2"></i>How It Works</h4>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6><i class="fas fa-user me-2"></i>For Users:</h6>
+                        <ul class="list-unstyled">
+                            <li><i class="fas fa-check text-success me-2"></i>Register and login to your account</li>
+                            <li><i class="fas fa-check text-success me-2"></i>Browse available parking lots</li>
+                            <li><i class="fas fa-check text-success me-2"></i>Book a parking spot automatically</li>
+                            <li><i class="fas fa-check text-success me-2"></i>Release spot when leaving</li>
+                            <li><i class="fas fa-check text-success me-2"></i>View parking history and costs</li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <h6><i class="fas fa-user-shield me-2"></i>For Administrators:</h6>
+                        <ul class="list-unstyled">
+                            <li><i class="fas fa-check text-success me-2"></i>Manage parking lots and spots</li>
+                            <li><i class="fas fa-check text-success me-2"></i>Monitor parking status</li>
+                            <li><i class="fas fa-check text-success me-2"></i>View user registrations</li>
+                            <li><i class="fas fa-check text-success me-2"></i>Generate reports and analytics</li>
+                            <li><i class="fas fa-check text-success me-2"></i>Set pricing and availability</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

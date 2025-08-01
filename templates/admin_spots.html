@@ -1,0 +1,159 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Parking Spots - Vehicle Parking App{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <h2><i class="fas fa-car me-2"></i>Manage Parking Spots</h2>
+    </div>
+</div>
+
+<!-- Filter by Parking Lot -->
+<div class="row mb-4">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-filter me-2"></i>Filter by Parking Lot</h5>
+            </div>
+            <div class="card-body">
+                <form method="GET" class="d-flex gap-2">
+                    <select name="lot_id" class="form-select" onchange="this.form.submit()">
+                        <option value="">All Parking Lots</option>
+                        {% for lot in parking_lots %}
+                            <option value="{{ lot.id }}" {% if selected_lot and selected_lot.id == lot.id %}selected{% endif %}>
+                                {{ lot.prime_location_name }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Parking Spots List -->
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-list me-2"></i>
+                    {% if selected_lot %}
+                        Parking Spots - {{ selected_lot.prime_location_name }}
+                    {% else %}
+                        All Parking Spots
+                    {% endif %}
+                </h5>
+            </div>
+            <div class="card-body">
+                {% if parking_spots %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th>Spot Number</th>
+                                    <th>Parking Lot</th>
+                                    <th>Status</th>
+                                    <th>Current User</th>
+                                    <th>Parked Since</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for spot in parking_spots %}
+                                    <tr>
+                                        <td>
+                                            <strong>{{ spot.spot_number }}</strong>
+                                        </td>
+                                        <td>{{ spot.prime_location_name }}</td>
+                                        <td>
+                                            {% if spot.status == 'A' %}
+                                                <span class="badge bg-success">Available</span>
+                                            {% else %}
+                                                <span class="badge bg-danger">Occupied</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if spot.current_reservation %}
+                                                {{ spot.current_reservation.username }}
+                                            {% else %}
+                                                <span class="text-muted">-</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if spot.current_reservation %}
+                                                {% if spot.current_reservation.parking_timestamp is string %}
+                                                    {{ spot.current_reservation.parking_timestamp[:16] }}
+                                                {% else %}
+                                                    {{ spot.current_reservation.parking_timestamp.strftime('%Y-%m-%d %H:%M') }}
+                                                {% endif %}
+                                            {% else %}
+                                                <span class="text-muted">-</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if spot.status == 'O' and spot.current_reservation %}
+                                                <a href="{{ url_for('admin_release_spot_route', reservation_id=spot.current_reservation.id) }}" 
+                                                   class="btn btn-sm btn-warning"
+                                                   onclick="return confirm('Are you sure you want to force release this spot?')">
+                                                    <i class="fas fa-sign-out-alt"></i> Force Release
+                                                </a>
+                                            {% else %}
+                                                <span class="text-muted">No action needed</span>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <!-- Statistics -->
+                    <div class="row mt-4">
+                        <div class="col-md-4">
+                            <div class="card bg-light">
+                                <div class="card-body text-center">
+                                    <h5 class="card-title">{{ parking_spots|length }}</h5>
+                                    <p class="card-text">Total Spots</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card bg-success text-white">
+                                <div class="card-body text-center">
+                                    <h5 class="card-title">{{ parking_spots|selectattr('status', 'equalto', 'A')|list|length }}</h5>
+                                    <p class="card-text">Available Spots</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card bg-danger text-white">
+                                <div class="card-body text-center">
+                                    <h5 class="card-title">{{ parking_spots|selectattr('status', 'equalto', 'O')|list|length }}</h5>
+                                    <p class="card-text">Occupied Spots</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% else %}
+                    <div class="text-center py-4">
+                        <i class="fas fa-car fa-3x text-muted mb-3"></i>
+                        <h5 class="text-muted">No parking spots found</h5>
+                        <p class="text-muted">
+                            {% if selected_lot %}
+                                No spots available in {{ selected_lot.prime_location_name }}.
+                            {% else %}
+                                No parking spots have been created yet.
+                            {% endif %}
+                        </p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 
